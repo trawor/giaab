@@ -1,0 +1,49 @@
+{
+  "name": "giaab",
+  "version": "0.1.0",
+  "description": "Another NodeJS Koa2 Project from template-node-koa",
+  "private": true,
+  "scripts": {
+    "start": "NODE_ENV=production node server",
+    "dev": "node server",
+    "lint": "eslint --ext .js,.vue src"
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "env": {
+      "node": true,
+      "es6": true,
+      "browser": true
+    },
+    "rules": {
+      "no-console": "off",
+      "no-plusplus": [
+        "error",
+        {
+          "allowForLoopAfterthoughts": true
+        }
+      ],
+      "comma-dangle": "warn",
+      "padded-blocks": "warn"
+    },
+    "globals": {
+      "describe": true,
+      "before": true,
+      "it": true
+    }
+  },
+  "dependencies": {
+    "@octokit/rest": "^16.19.0",
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
+    "lowdb": "^1.0.0",
+    "markdown-it": "^8.4.2",
+    "markdown-it-meta": "0.0.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
+  }
+}
