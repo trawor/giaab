@@ -9,6 +9,8 @@ async function run() {
   } else {
     console.log('Already Init!');
   }
+
+  // TODO: auto init repo: label webhook ,etc
 }
 
 module.exports = {

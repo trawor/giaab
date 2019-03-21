@@ -17,7 +17,7 @@ async function run() {
           user,
         } = issues[0];
         db.set('user', user).write();
-        const c = issues.map(item => model.parsePost(item));
+        const c = issues.map(item => model.Gpost.parse(item)).filter(item => item.is_public);
         db.set('posts', c).write();
         db.set('last_sync', Date.now()).write();
         resolve(c);

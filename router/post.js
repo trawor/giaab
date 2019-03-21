@@ -12,10 +12,21 @@ router.get('/', async (ctx) => {
   const ret = db.get('posts')
     .filter({
       is_public: true,
+      is_page: false,
     })
-    .sortBy('created_at')
+    .sortBy('number')
     // FIXME: page .take(10)
     .value();
+  ctx.body = ret;
+});
+
+router.get('/:id', async (ctx) => {
+  const ret = model.Gpost.get(ctx.params.id);
+  if (!ret) {
+    ctx.status = 404;
+    ctx.body = {};
+    return;
+  }
   ctx.body = ret;
 });
 

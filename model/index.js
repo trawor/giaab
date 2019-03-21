@@ -16,7 +16,6 @@ md.use(meta);
 const config = require('../config');
 
 function init() {
-
   db.defaults({
     posts: [],
     comments: [],
@@ -35,58 +34,70 @@ function githubClient() {
   return new Octokit(clientOpt);
 }
 
-function parsePost(item) {
-  const {
-    id,
-    number,
-    title,
-    body,
-    created_at,
-    updated_at,
-    locked,
-    comments,
-    labels,
-  } = item;
-  const ret = {
-    id,
-    number,
-    title,
-    body,
-    created_at,
-    updated_at,
-    locked,
-    comments,
-    tags: labels.map((item2) => {
-      return {
-        name: item2.name,
-        color: item2.color,
-      };
-    }),
-  };
+class Gpost {
+  static parse(item) {
+    const ret = {
+      id: item.id.toString(),
+      number: item.number.toString(),
+      title: item.title,
+      body: item.body,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      locked: item.locked,
+      comments: item.comments,
+      is_public: false,
+      is_page: false,
+    };
+    ret.permalink = ret.number;
 
-  ret.permalink = ret.number;
 
-  if (labels.length > 0) {
-    labels.forEach((element) => {
-      if (element.name === '@public') {
-        ret.is_public = true;
-      } else if (element.name === '@page') {
-        ret.is_page = true;
-      }
-    });
+    if (item.labels.length > 0) {
+      ret.tags = item.labels.map((item2) => {
+        if (item2.name === '@public') {
+          ret.is_public = true;
+        } else if (item2.name === '@page') {
+          ret.is_page = true;
+        }
+
+        return {
+          name: item2.name,
+          color: item2.color,
+        };
+      }).filter(item2 => !item2.name.match(/^[@|_]/));
+    }
+
+    md.render(item.body);
+    ret.meta = md.meta;
+    if (ret.meta.link) {
+      ret.permalink = ret.meta.link;
+    }
+    md.meta = {};
+
+    return ret;
   }
 
-  ret.document = md.render(item.body);
-  ret.meta = md.meta;
-  md.meta = {};
+  static get(idOrNumberOrPermalink) {
+    let post = db.get('posts').find({
+      permalink: idOrNumberOrPermalink,
+    }).value();
+    if (post) return post;
 
-  return ret;
+    post = db.get('posts').find({
+      number: idOrNumberOrPermalink,
+    }).value();
+    if (post) return post;
+
+    post = db.get('posts').find({
+      id: idOrNumberOrPermalink,
+    }).value();
+
+    return post;
+  }
 }
 
-
 module.exports = {
+  Gpost,
   db,
   client: githubClient(),
   init,
-  parsePost,
 };

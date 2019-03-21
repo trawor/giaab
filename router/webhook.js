@@ -8,39 +8,49 @@ const db = model.db;
 module.exports = router;
 
 router.post('/github', async (ctx) => {
+  // FIXME: check body sign https://developer.github.com/webhooks/securing/
   const {
     body,
   } = ctx.request;
-  const post = body.issue;
-
+  const ret = {};
   switch (ctx.headers['x-github-event']) {
-    case 'issue':
-      if (body.action === 'opened') {
-        db.get('posts')
-          .push(model.parsePost(post)).write();
-      } else if (body.action === 'edited') {
-        db.get('posts')
-          .find({
-            id: post.id,
-          })
-          .assign(model.parsePost(post))
-          .write();
+    case 'issues':
+      // eslint-disable-next-line no-case-declarations
+      const post = model.Gpost.parse(body.issue);
+      console.log(`Issue ${body.action}`);
+      if (post.is_public) {
+        if (body.action === 'opened') {
+          console.log('new post');
+
+          db.get('posts')
+            .push(model.Gpost.parse(post)).write();
+          ret.msg = 'new post';
+        } else if (body.action === 'edited' || body.action === 'labeled') {
+          console.log('Post update');
+          db.get('posts')
+            .find({
+              id: post.id,
+            })
+            .assign(model.Gpost.parse(post))
+            .write();
+          ret.msg = 'update post';
+        }
+      } else {
+        db.get('posts').remove({
+          id: post.id,
+        }).write();
+        ret.msg = 'remove post';
       }
+
       break;
     case 'issue_comment':
-      console.log(`New Comment for ${post.id}[${post.number}]-- ${post.title}:`);
-      console.log(`${body.comment.id}\n${body.comment.body}`);
-
-      break;
-
     default:
       console.log(`Ignore Event: ${ctx.headers['x-github-event']}`);
       console.log(ctx.headers, ctx.request.body);
+      ret.msg = 'ignored';
       break;
   }
 
 
-  ctx.body = {
-    msg: 'ok',
-  };
+  ctx.body = ret;
 });
