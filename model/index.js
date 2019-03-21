@@ -46,17 +46,15 @@ class Gpost {
       locked: item.locked,
       comments: item.comments,
       is_public: false,
-      is_page: false,
+      type: 'post',
     };
-    ret.permalink = ret.number;
-
 
     if (item.labels.length > 0) {
       ret.tags = item.labels.map((item2) => {
         if (item2.name === '@public') {
           ret.is_public = true;
         } else if (item2.name === '@page') {
-          ret.is_page = true;
+          ret.type = 'page';
         }
 
         return {
@@ -68,9 +66,7 @@ class Gpost {
 
     md.render(item.body);
     ret.meta = md.meta;
-    if (ret.meta.link) {
-      ret.permalink = ret.meta.link;
-    }
+    ret.permalink = ret.meta.link || ret.meta.permalink || ret.number;
     md.meta = {};
 
     return ret;

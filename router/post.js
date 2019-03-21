@@ -12,7 +12,7 @@ router.get('/', async (ctx) => {
   const ret = db.get('posts')
     .filter({
       is_public: true,
-      is_page: false,
+      type: 'post',
     })
     .sortBy('number')
     // FIXME: page .take(10)
