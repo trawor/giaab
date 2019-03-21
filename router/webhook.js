@@ -2,6 +2,7 @@ const router = require('koa-router')({
   prefix: 'api/webhook',
 });
 const model = require('../model/index');
+
 const db = model.db;
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const router = require('koa-router')();
+const config = require('../config');
 
 const pkginfo = require('../package.json');
 
@@ -27,8 +28,10 @@ rmap.router = ra;
 console.info(`Server Routers:\n${ra.join('\n')}`);
 
 router.get('/api', (ctx) => {
-  const ret = rmap;
-  ret.ip = ctx.ip;
+  // FIXME: site info
+  const ret = {
+    title: config.giaab.siteTitle,
+  };
   ctx.body = ret;
 });
 

@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const cluster = require('cluster');
 const os = require('os');
+const init = require('./bin/init');
 
 const ENV = process.env.NODE_ENV === 'production' ? 'P' : 'D';
 
@@ -60,7 +61,6 @@ async function startHTTP(port) {
 
 async function start() {
   if (cluster.isMaster) {
-    const init = require('./bin/init');
     await init.run();
   }
   await startHTTP();
